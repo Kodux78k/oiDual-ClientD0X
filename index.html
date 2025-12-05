@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ClientDocs · Dual.Infodose</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0f17" />
+
+<!-- Ícones SVG (Lucide) -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- Libs externas: OCR + PDF -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+/* ==========================================================
+   TEMA · INFODOSE · NEBULA PRO / BASE MADEIRA · V7.3
+   ========================================================== */
+:root{
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --shadow-soft: 0 0 26px rgba(0,0,0,.45);
+  --shadow-sm: 0 0 12px rgba(0,0,0,.4);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Paleta base (Nebula / Madeira) */
+
+  /* Nebula Pro (antes "dark") */
+  --bg-main-nebula: radial-gradient(circle at 20% 10%, #00eaff28, transparent 60%),
+                    radial-gradient(circle at 80% 0%, #ff8aff22, transparent 70%),
+                    #050712;
+  --card-nebula: #050814;
+  --card-soft-nebula: #0b1020;
+  --card-hover-nebula: #151a30;
+  --madeira-nebula: #37d48c;
+  --madeira-soft-nebula: #2bb276;
+  --accent-pink-nebula: #ff8aff;
+  --text-nebula: #ecf2f7;
+  --text-soft-nebula: #a6b1c2;
+
+  /* Base Madeira (versão clara) */
+  --bg-main-madeira: radial-gradient(circle at 10% 0%, #c0ffe833, transparent 55%),
+                     radial-gradient(circle at 90% 0%, #ffd0ff33, transparent 60%),
+                     #f4f6fb;
+  --card-madeira: #ffffff;
+  --card-soft-madeira: #f0f2ff;
+  --card-hover-madeira: #e0e5ff;
+  --madeira-madeira: #1bb56c;
+  --madeira-soft-madeira: #0e9a59;
+  --accent-pink-madeira: #d452ff;
+  --text-madeira: #101321;
+  --text-soft-madeira: #616d86;
+}
+
+/* Tema NEBULA PRO */
+body[data-theme="nebula"]{
+  --bg-main: var(--bg-main-nebula);
+  --card: var(--card-nebula);
+  --card-soft: var(--card-soft-nebula);
+  --card-hover: var(--card-hover-nebula);
+  --madeira: var(--madeira-nebula);
+  --madeira-soft: var(--madeira-soft-nebula);
+  --accent-pink: var(--accent-pink-nebula);
+  --text: var(--text-nebula);
+  --text-soft: var(--text-soft-nebula);
+}
+
+/* Tema BASE MADEIRA */
+body[data-theme="madeira"]{
+  --bg-main: var(--bg-main-madeira);
+  --card: var(--card-madeira);
+  --card-soft: var(--card-soft-madeira);
+  --card-hover: var(--card-hover-madeira);
+  --madeira: var(--madeira-madeira);
+  --madeira-soft: var(--madeira-soft-madeira);
+  --accent-pink: var(--accent-pink-madeira);
+  --text: var(--text-madeira);
+  --text-soft: var(--text-soft-madeira);
+}
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--bg-main);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  overflow-y:auto;
+}
+
+.app-shell{
+  width:100%;
+  max-width:480px;
+  padding:20px 18px 96px;
+}
+
+/* ==========================
+   ELEMENTOS BÁSICOS
+   ========================== */
+.hidden{display:none;}
+h1,h2,h3{margin:0;padding:0;}
+
+.small{
+  font-size:.82rem;
+  color:var(--text-soft);
+}
+
+/* ==========================
+   CARDS · ESTILO INFODOSE
+   ========================== */
+.card-base{
+  position:relative;
+  border-radius:var(--radius-lg);
+  padding:1px;
+  background:
+    linear-gradient(135deg, rgba(55,212,140,.4), rgba(255,138,255,.25));
+  box-shadow:var(--shadow-soft);
+  margin-bottom:16px;
+  overflow:hidden;
+}
+
+.card-inner{
+  border-radius:inherit;
+  background:radial-gradient(circle at 0% 0%, rgba(28,36,56,0.95) 0, var(--card) 48%, var(--card) 100%);
+  padding:16px 16px 14px;
+  position:relative;
+}
+
+body[data-theme="madeira"] .card-inner{
+  background:radial-gradient(circle at 0% 0%, #ffffff 0, var(--card) 60%, var(--card) 100%);
+}
+
+.card-inner::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 110% -10%, rgba(255,255,255,.12), transparent 55%);
+  mix-blend-mode:screen;
+  opacity:.55;
+  pointer-events:none;
+}
+
+.card-inner-content{
+  position:relative;
+  z-index:2;
+}
+
+.card-header-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.card-pill{
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  background:radial-gradient(circle at 30% 20%, #ffffff, #5cf0b6 40%, #1f8254 75%);
+  box-shadow:0 0 18px rgba(55,212,140,.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.card-pill svg{
+  width:20px;
+  height:20px;
+  color:#0b311f;
+}
+
+.card-title-block{
+  display:flex;
+  flex-direction:column;
+}
+
+.card-title{
+  font-size:1rem;
+  font-weight:600;
+}
+.card-sub{
+  font-size:.8rem;
+  color:var(--text-soft);
+}
+
+/* brilho leve na borda */
+@keyframes cardGlow {
+  0% { filter:drop-shadow(0 0 0 rgba(55,212,140,.0)); }
+  50%{ filter:drop-shadow(0 0 16px rgba(55,212,140,.4)); }
+  100%{ filter:drop-shadow(0 0 0 rgba(55,212,140,.0)); }
+}
+.card-base{
+  animation:cardGlow 5s ease-in-out infinite;
+}
+
+/* ==========================
+   LISTAS / ITENS
+   ========================== */
+.list-item{
+  padding:14px 14px 12px;
+  background:var(--card-soft);
+  margin-bottom:10px;
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:.18s ease-out;
+  transform-origin:center;
+}
+.list-item:hover{
+  background:var(--card-hover);
+  transform:translateY(-1px) scale(1.01);
+}
+
+/* fade-up na entrada */
+@keyframes fadeUp {
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+.fade-up{
+  animation:fadeUp .35s ease-out;
+}
+
+/* ==========================
+   INPUTS / BOTÕES
+   ========================== */
+input,button,select,textarea{
+  font-size:.96rem;
+  padding:11px 13px;
+  border-radius:var(--radius-md);
+  border:none;
+  outline:none;
+}
+
+input,textarea{
+  width:100%;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.08);
+  transition:.2s;
+}
+body[data-theme="madeira"] input,
+body[data-theme="madeira"] textarea{
+  border-color:rgba(0,0,0,.08);
+}
+input:focus,textarea:focus{
+  border-color:var(--madeira);
+  box-shadow:0 0 0 1px rgba(55,212,140,.6);
+}
+
+button{
+  background:linear-gradient(135deg, var(--madeira), var(--madeira-soft));
+  color:#020305;
+  font-weight:600;
+  cursor:pointer;
+  border-radius:999px;
+  border:none;
+  box-shadow:0 10px 22px rgba(0,0,0,.45);
+  transition:.14s ease-out;
+}
+button:active{
+  transform:translateY(1px) scale(.98);
+  box-shadow:0 6px 14px rgba(0,0,0,.6);
+}
+
+/* botões fantasma */
+.btn-ghost{
+  background:transparent;
+  color:var(--text-soft);
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:none;
+}
+body[data-theme="madeira"] .btn-ghost{
+  border-color:rgba(0,0,0,.12);
+}
+.btn-ghost:active{
+  transform:none;
+}
+
+/* ícone inline em botões */
+.icon-inline{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:4px;
+}
+.icon-inline svg{
+  width:16px;
+  height:16px;
+}
+
+/* erro nos inputs */
+.input-error{
+  border-color:#ff8a8a !important;
+  box-shadow:0 0 0 1px rgba(255,138,138,.7);
+}
+
+/* ==========================
+   FORM INLINE DE RECIBO (Painel)
+   ========================== */
+.form-grid{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:10px;
+}
+.form-row label{
+  display:block;
+  margin-bottom:4px;
+  font-size:.78rem;
+  color:var(--text-soft);
+}
+.form-row input{
+  width:100%;
+}
+
+.form-actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+/* info de imagens pendentes */
+.pending-images-info{
+  margin-top:8px;
+  font-size:.78rem;
+  color:var(--text-soft);
+}
+
+/* ==========================
+   SCREENS
+   ========================== */
+.screen{
+  display:none;
+  animation:fadeUp .35s ease-out;
+}
+.screen.active{display:block;}
+
+.app-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.app-title{
+  font-size:1.1rem;
+  font-weight:600;
+}
+.badge-mini{
+  font-size:.72rem;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(55,212,140,.18);
+  color:var(--madeira);
+}
+
+/* ==========================
+   CAMERA FAB ORB + MENU
+   ========================== */
+.camera-fab-group{
+  position:fixed;
+  bottom:22px;
+  right:22px;
+  z-index:30;
+}
+
+.camera-btn{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 20%, #ffffff, #5cf0b6 40%, #196845 90%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 0 0 0 rgba(55,212,140,.5);
+  color:#020305;
+  border:none;
+}
+
+/* animação de pulso */
+@keyframes pulseCam {
+  0%{ box-shadow:0 0 0 0 rgba(55,212,140,.6); transform:scale(1); }
+  70%{ box-shadow:0 0 0 18px rgba(55,212,140,0); transform:scale(1.04); }
+  100%{ box-shadow:0 0 0 0 rgba(55,212,140,0); transform:scale(1); }
+}
+.camera-btn{
+  animation:pulseCam 2.4s ease-out infinite;
+}
+
+.camera-btn-icon svg{
+  width:28px;
+  height:28px;
+  transition:transform .2s ease-out;
+}
+
+.camera-fab-group.open .camera-btn-icon svg{
+  transform:rotate(45deg);
+}
+
+/* opções FAB (câmera, painel, chat, tema) */
+.fab-options{
+  position:absolute;
+  bottom:80px;
+  right:8px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(6px);
+  transition:.18s ease-out;
+}
+.fab-options.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0);
+}
+.fab-option{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:var(--card-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 18px rgba(0,0,0,.7);
+  border:1px solid rgba(255,255,255,.14);
+  padding:0;
+}
+body[data-theme="madeira"] .fab-option{
+  border-color:rgba(0,0,0,.14);
+}
+.fab-option svg{
+  width:22px;
+  height:22px;
+  color:var(--madeira);
+}
+
+/* ==========================
+   TOPO / BOTÕES DE NAVEGAÇÃO
+   ========================== */
+.topbar-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.topbar-left{
+  display:flex;
+  flex-direction:column;
+}
+
+.topbar-title{
+  font-size:1.1rem;
+  font-weight:600;
+}
+
+.topbar-sub{
+  font-size:.8rem;
+  color:var(--text-soft);
+}
+
+/* links */
+a{color:var(--madeira);}
+
+/* ==========================
+   TOAST INFODOSE
+   ========================== */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:16px;
+  transform:translateX(-50%) translateY(12px);
+  background:rgba(5,8,20,.96);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:.8rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.65);
+  opacity:0;
+  pointer-events:none;
+  transition:.22s ease-out;
+  z-index:40;
+  border:1px solid rgba(255,255,255,.08);
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+  pointer-events:auto;
+}
+.toast-error{
+  border-color:#ff8a8a;
+  color:#ffe5e5;
+}
+.toast-ok{
+  border-color:var(--madeira);
+  color:#dfffee;
+}
+
+/* ==========================
+   MODAL (Formulários + Chat)
+   ========================== */
+.modal-shell{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:50;
+  pointer-events:none;
+  opacity:0;
+  transition:.2s ease-out;
+}
+.modal-shell.show{
+  pointer-events:auto;
+  opacity:1;
+}
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+}
+.modal-card{
+  position:relative;
+  width:100%;
+  max-width:460px;
+  margin:0 12px 20px;
+  background:var(--card);
+  border-radius:18px;
+  padding:16px 16px 14px;
+  box-shadow:0 18px 40px rgba(0,0,0,.75);
+  animation:modalUp .22s ease-out;
+}
+body[data-theme="madeira"] .modal-card{
+  box-shadow:0 18px 40px rgba(0,0,0,.35);
+}
+@keyframes modalUp{
+  from{transform:translateY(20px); opacity:0;}
+  to{transform:translateY(0); opacity:1;}
+}
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+.modal-title{
+  font-size:1rem;
+  font-weight:600;
+}
+.modal-body{
+  font-size:.9rem;
+}
+.modal-actions{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+}
+.modal-actions button{
+  flex:1;
+}
+
+/* textarea no modal */
+.modal-card textarea{
+  min-height:120px;
+  resize:vertical;
+}
+
+/* Chat IA no modal */
+.ai-chat-thread{
+  max-height:220px;
+  overflow-y:auto;
+  border-radius:12px;
+  background:var(--card-soft);
+  padding:8px 10px;
+  margin-bottom:8px;
+  font-size:.85rem;
+}
+.ai-msg{
+  margin-bottom:6px;
+  padding:6px 8px;
+  border-radius:10px;
+}
+.ai-msg-user{
+  background:rgba(55,212,140,.14);
+  text-align:right;
+}
+.ai-msg-bot{
+  background:rgba(255,255,255,.04);
+}
+
+/* ==========================
+   ACCORDION · CARDS SANFONADOS
+   ========================== */
+.card-base[data-accordion] .accordion-body{
+  overflow:hidden;
+  max-height:9999px;
+  transition:max-height .22s ease-out, opacity .18s ease-out;
+}
+.card-base[data-accordion="closed"] .accordion-body{
+  max-height:0;
+  opacity:.0;
+}
+.card-base[data-accordion] .accordion-header{
+  cursor:pointer;
+}
+.accordion-header-main{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1;
+}
+.accordion-chevron{
+  margin-left:auto;
+  font-size:.9rem;
+  opacity:.75;
+  transition:transform .18s ease-out;
+}
+.card-base[data-accordion="closed"] .accordion-chevron{
+  transform:rotate(-90deg);
+}
+
+/* ==========================
+   RECEIPTS · STATUS + DASHBOARD
+   ========================== */
+.receipt-meta-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.receipt-status-pill{
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:.7rem;
+  font-weight:500;
+  cursor:pointer;
+}
+.receipt-status-paid{
+  background:rgba(55,212,140,.18);
+  color:var(--madeira);
+}
+.receipt-status-open{
+  background:rgba(255,138,138,.16);
+  color:#ffd0d0;
+}
+body[data-theme="madeira"] .receipt-status-open{
+  color:#b62828;
+}
+
+/* badge visual de imagem vinculada */
+.receipt-has-image{
+  font-size:.7rem;
+  opacity:.8;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+
+/* Dashboard financeiro da pasta */
+.folder-dashboard{
+  font-size:.82rem;
+  background:var(--card-soft);
+  border-radius:var(--radius-md);
+  padding:10px 12px;
+  box-shadow:var(--shadow-sm);
+}
+.folder-dashboard-row{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:4px;
+}
+.folder-dashboard-row strong{
+  font-weight:600;
+}
+</style>
+</head>
+
+<body data-theme="nebula">
+<div class="app-shell">
+
+  <!-- ==========================
+       HOME
+       ========================== -->
+  <div id="screen-home" class="screen active">
+    <div class="app-header">
+      <div class="app-title">ClientDocs</div>
+      <span class="badge-mini">Infodose · V7.3</span>
+    </div>
+
+    <!-- Central de Clientes · SANFONA -->
+    <div class="card-base fade-up" data-accordion="open">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row accordion-header" data-accordion-header>
+            <div class="accordion-header-main">
+              <div class="card-pill">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="card-title-block">
+                <div class="card-title">Central de Clientes</div>
+                <div class="card-sub">Busque, importe ou cadastre clientes e recibos.</div>
+              </div>
+            </div>
+            <span class="accordion-chevron">⌄</span>
+          </div>
+
+          <div class="accordion-body" data-accordion-body>
+            <div style="margin-top:12px;">
+              <input id="search" placeholder="Buscar por nome, código ou telefone" oninput="renderClients()" />
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:14px;">
+              <button style="flex:1;" onclick="importExcel()">Importar Excel / CSV</button>
+              <button style="flex:1;" class="btn-ghost" onclick="openClientModal()">Cadastro manual</button>
+            </div>
+
+            <button class="btn-ghost" style="margin-top:8px;width:100%;" onclick="exportClientsCsv()">
+              Exportar planilha de clientes
+            </button>
+
+            <p class="small" style="margin-top:6px;opacity:.7;">
+              Dica: exporte sua planilha do Excel como <b>.csv</b> (código, nome, telefone).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-line" style="margin-top:8px;">
+      <div class="topbar-left">
+        <div class="topbar-title">Lista de clientes</div>
+        <div class="topbar-sub">Toque para abrir pastas e recibos.</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="btn-ghost" style="padding:6px 8px;font-size:.78rem;" onclick="toggleTheme()">
+          <span class="icon-inline"><i data-lucide="sparkles"></i></span>
+          Tema
+        </button>
+        <button id="admin-btn" class="btn-ghost hidden" style="padding:6px 10px;font-size:.78rem;" onclick="openScreen('screen-admin')">
+          <span class="icon-inline"><i data-lucide="settings"></i></span>
+          Admin
+        </button>
+      </div>
+    </div>
+
+    <div id="client-list"></div>
+  </div>
+
+  <!-- ==========================
+       CLIENTE → PASTAS
+       ========================== -->
+  <div id="screen-client" class="screen">
+    <div class="topbar-line">
+      <button class="btn-ghost" onclick="openScreen('screen-home')">← Clientes</button>
+      <span class="badge-mini">Cliente</span>
+    </div>
+
+    <h2 id="client-name" style="margin-bottom:12px;"></h2>
+    <p class="small">Aqui você organiza as pastas (Recibos, Contratos, etc.) deste cliente.</p>
+
+    <div class="card-base" style="margin-top:12px;" data-accordion="open">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row accordion-header" data-accordion-header>
+            <div class="accordion-header-main">
+              <div class="card-pill">
+                <i data-lucide="folder"></i>
+              </div>
+              <div class="card-title-block">
+                <div class="card-title">Pastas do cliente</div>
+                <div class="card-sub">Crie e gerencie agrupamentos de recibos.</div>
+              </div>
+            </div>
+            <span class="accordion-chevron">⌄</span>
+          </div>
+
+          <div class="accordion-body" data-accordion-body>
+            <button style="width:100%;margin-top:12px;" onclick="openFolderModal()">Criar nova pasta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:10px;margin-bottom:6px;">Pastas</h3>
+    <div id="folder-list"></div>
+  </div>
+
+  <!-- ==========================
+       PASTA → RECIBOS
+       ========================== -->
+  <div id="screen-folder" class="screen">
+    <div class="topbar-line">
+      <button class="btn-ghost" onclick="openScreen('screen-client')">← Pastas</button>
+      <span class="badge-mini">Pasta</span>
+    </div>
+
+    <h2 id="folder-name" style="margin-bottom:6px;"></h2>
+    <p class="small">Cadastre recibos desta pasta (foto, galeria ou manual).</p>
+
+    <!-- Painel Recibo Manual · SANFONA + badge de anexos -->
+    <div class="card-base" style="margin-top:10px;" data-accordion="open">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row accordion-header" data-accordion-header>
+            <div class="accordion-header-main">
+              <div class="card-pill">
+                <i data-lucide="file-text"></i>
+              </div>
+              <div class="card-title-block">
+                <div class="card-title">Painel de Recibo Manual</div>
+                <div class="card-sub">Preencha os campos e salve direto nesta pasta.</div>
+              </div>
+            </div>
+            <span class="accordion-chevron">⌄</span>
+          </div>
+
+          <div class="accordion-body" data-accordion-body>
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="rec-numero">Número do pedido</label>
+                <input id="rec-numero" placeholder="Ex.: 1234" />
+              </div>
+              <div class="form-row">
+                <label for="rec-valor">Valor do pedido (R$)</label>
+                <input id="rec-valor" placeholder="Ex.: 250,00" />
+              </div>
+              <div class="form-row">
+                <label for="rec-data">Data do pedido</label>
+                <input id="rec-data" placeholder="Ex.: 10/12/2025" />
+              </div>
+              <div class="form-row">
+                <label class="small">
+                  <input type="checkbox" id="rec-pago" /> Marcar como pago
+                </label>
+              </div>
+            </div>
+
+            <div class="pending-images-info" id="pending-images-info">
+              Nenhuma imagem pendente para o próximo recibo.
+            </div>
+            <button
+              class="btn-ghost"
+              style="margin-top:4px;width:100%;"
+              onclick="clearPendingImage()"
+            >
+              Limpar anexo pendente
+            </button>
+
+            <div class="form-actions">
+              <button onclick="addReceipt()">Salvar recibo</button>
+              <button class="btn-ghost" onclick="clearReceiptForm()">Limpar</button>
+            </div>
+
+            <button class="btn-ghost" style="margin-top:10px;width:100%;" onclick="openBatchReceiptsModal()">
+              Adicionar vários recibos em lote
+            </button>
+
+            <button class="btn-ghost" style="margin-top:6px;width:100%;" onclick="exportFolderPdf()">
+              Exportar recibos desta pasta (PDF)
+            </button>
+
+            <button class="btn-ghost" style="margin-top:6px;width:100%;" onclick="exportFolderCsv()">
+              Exportar recibos desta pasta (CSV)
+            </button>
+
+            <button class="btn-ghost" style="margin-top:6px;width:100%;" onclick="sendFolderToWebhook()">
+              Enviar pasta para Webhook Infodose
+            </button>
+
+            <p class="small" style="margin-top:6px;opacity:.7;">
+              Os campos obrigatórios seguem o que você marcar no painel Admin.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard financeiro -->
+    <div class="card-base">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row">
+            <div class="card-pill">
+              <i data-lucide="pie-chart"></i>
+            </div>
+            <div class="card-title-block">
+              <div class="card-title">Resumo financeiro</div>
+              <div class="card-sub">Total, pagos, em aberto e previsão da pasta.</div>
+            </div>
+          </div>
+
+          <div id="folder-dashboard" class="folder-dashboard" style="margin-top:8px;">
+            <!-- preenchido via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:10px;margin-bottom:6px;">Lista de recibos</h3>
+    <div id="receipt-list"></div>
+  </div>
+
+  <!-- ==========================
+       ADMIN
+       ========================== -->
+  <div id="screen-admin" class="screen">
+    <div class="topbar-line">
+      <button class="btn-ghost" onclick="openScreen('screen-home')">← Home</button>
+      <span class="badge-mini">Admin</span>
+    </div>
+
+    <h2 style="margin-bottom:10px;">Painel administrativo</h2>
+    <p class="small">Ajuste campos obrigatórios, usuários, webhook e visualize o log.</p>
+
+    <div class="card-base" style="margin-top:12px;">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row">
+            <div class="card-pill">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <div class="card-title-block">
+              <div class="card-title">Campos obrigatórios</div>
+              <div class="card-sub">Defina o que sempre deve ser preenchido.</div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px;">
+            <label class="small">
+              <input type="checkbox" id="req-numero" /> Número do pedido
+            </label><br>
+            <label class="small">
+              <input type="checkbox" id="req-valor" /> Valor do pedido
+            </label>
+          </div>
+          <button style="width:100%;margin-top:12px;" onclick="saveReq()">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-base">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row">
+            <div class="card-pill">
+              <i data-lucide="user-cog"></i>
+            </div>
+            <div class="card-title-block">
+              <div class="card-title">Usuários</div>
+              <div class="card-sub">Admin & padrão para operar o app.</div>
+            </div>
+          </div>
+
+          <button style="width:100%;margin-top:10px;" onclick="openUserModal()">Cadastrar usuário</button>
+          <div id="user-list" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-base">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row">
+            <div class="card-pill">
+              <i data-lucide="satellite-dish"></i>
+            </div>
+            <div class="card-title-block">
+              <div class="card-title">Integração Infodose / Webhook</div>
+              <div class="card-sub">Envie pastas para N8n, WhatsApp, IA, etc.</div>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top:6px;">
+            <div class="form-row">
+              <label class="small" for="webhook-url">URL do Webhook</label>
+              <input id="webhook-url" placeholder="https://seu-n8n-ou-webhook.com/webhook/..." />
+            </div>
+            <div class="form-row" style="margin-top:6px;">
+              <label class="small">
+                <input type="checkbox" id="webhook-enabled" /> Ativar envio para webhook
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-actions" style="margin-top:10px;">
+            <button onclick="saveWebhookSettings()">Salvar</button>
+            <button class="btn-ghost" onclick="sendWebhookSample()">Testar envio</button>
+          </div>
+
+          <p class="small" style="margin-top:6px;opacity:.7;">
+            O app envia JSON com cliente, pasta e recibos. Seu fluxo (N8n, etc.) pode
+            chamar IA, gerar PDF especial, mandar pro WhatsApp ou salvar em banco.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-base">
+      <div class="card-inner">
+        <div class="card-inner-content">
+          <div class="card-header-row">
+            <div class="card-pill">
+              <i data-lucide="scroll-text"></i>
+            </div>
+            <div class="card-title-block">
+              <div class="card-title">Log do sistema</div>
+              <div class="card-sub">Registro básico das ações.</div>
+            </div>
+          </div>
+
+          <div id="log-list" class="small" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB ORB + OPÇÕES -->
+<div class="camera-fab-group">
+  <button class="camera-btn" onclick="toggleFabMenu()">
+    <span class="camera-btn-icon">
+      <i data-lucide="orbit"></i>
+    </span>
+  </button>
+
+  <div class="fab-options" id="fab-options">
+    <button class="fab-option" onclick="fabCamera()" title="Capturar recibo">
+      <i data-lucide="camera"></i>
+    </button>
+    <button class="fab-option" onclick="fabPrediction()" title="Painel de previsão">
+      <i data-lucide="activity"></i>
+    </button>
+    <button class="fab-option" onclick="fabChat()" title="Chat IA Infodose">
+      <i data-lucide="message-circle"></i>
+    </button>
+    <button class="fab-option" onclick="fabTheme()" title="Trocar tema">
+      <i data-lucide="palette"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Modal genérico -->
+<div id="modal-shell" class="modal-shell hidden">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <div class="modal-header">
+      <div id="modal-title" class="modal-title"></div>
+      <button class="btn-ghost" style="padding:4px 8px;font-size:.8rem;" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Inputs escondidos para import e câmera -->
+<input type="file" id="excel-input" class="hidden" accept=".csv,.txt" />
+<input type="file" id="camera-input" class="hidden" accept="image/*" capture="environment" />
+
+<!-- ==========================
+     JAVASCRIPT CORE · V7.3
+     ========================== -->
+<script>
+let users   = JSON.parse(localStorage.getItem("users")   || "[]");
+let isAdmin = JSON.parse(localStorage.getItem("isAdmin") || "true"); // padrão: você é admin
+let clients = JSON.parse(localStorage.getItem("clients") || "[]");
+let folders = JSON.parse(localStorage.getItem("folders") || "{}");
+let receipts= JSON.parse(localStorage.getItem("receipts")|| "{}");
+let logs    = JSON.parse(localStorage.getItem("logs")    || "[]");
+
+// campos obrigatórios
+let requiredFields = JSON.parse(
+  localStorage.getItem("requiredFields") ||
+  '{"numero":false,"valor":false}'
+);
+
+// settings de webhook (também espelhado em IndexedDB)
+let webhookSettings = JSON.parse(
+  localStorage.getItem("webhookSettings") ||
+  '{"url":"","enabled":false}'
+);
+
+// tema
+(function initTheme(){
+  const saved = localStorage.getItem("clientdocs_theme") || "nebula";
+  document.body.setAttribute("data-theme", saved);
+})();
+
+/* ==========================
+   IndexedDB · Infodose
+   ========================== */
+let infodoseDB = null;
+
+// image pendente pra amarrar no próximo recibo
+let pendingImageId = null;
+
+function openInfodoseDB(){
+  return new Promise((resolve,reject)=>{
+    if(!("indexedDB" in window)){
+      console.warn("IndexedDB não disponível, segue só com localStorage.");
+      return resolve(null);
+    }
+    const request = indexedDB.open("clientdocs_infodose", 1);
+    request.onupgradeneeded = (e)=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains("settings")){
+        db.createObjectStore("settings",{keyPath:"key"});
+      }
+      if(!db.objectStoreNames.contains("images")){
+        db.createObjectStore("images",{keyPath:"id"});
+      }
+    };
+    request.onsuccess = (e)=>{
+      infodoseDB = e.target.result;
+      resolve(infodoseDB);
+    };
+    request.onerror = (e)=>{
+      console.error("Erro IndexedDB", e.target.error);
+      reject(e.target.error);
+    };
+  });
+}
+
+function dbSaveSetting(key, value){
+  if(!infodoseDB) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const tx = infodoseDB.transaction("settings","readwrite");
+    tx.objectStore("settings").put({key,value});
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e.target.error);
+  });
+}
+
+function dbGetSetting(key){
+  if(!infodoseDB) return Promise.resolve(null);
+  return new Promise((resolve,reject)=>{
+    const tx = infodoseDB.transaction("settings","readonly");
+    const req = tx.objectStore("settings").get(key);
+    req.onsuccess = ()=>resolve(req.result ? req.result.value : null);
+    req.onerror = (e)=>reject(e.target.error);
+  });
+}
+
+function dbSaveImage(id, file){
+  if(!infodoseDB) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const tx = infodoseDB.transaction("images","readwrite");
+    tx.objectStore("images").put({id,file,createdAt:Date.now()});
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e.target.error);
+  });
+}
+
+/* TOAST */
+let toastTimeout = null;
+function showToast(msg, type){
+  const t = document.getElementById("toast");
+  if(!t) return;
+  t.textContent = msg;
+  t.className = "toast";
+  if(type === "error") t.classList.add("toast-error");
+  if(type === "ok") t.classList.add("toast-ok");
+  t.classList.add("show");
+  if(toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>{
+    t.classList.remove("show");
+  }, 2600);
+}
+
+/* ESCAPE */
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
+
+/* MODAL GENÉRICO */
+let modalMode = null;
+function openModal(title, bodyHtml){
+  const shell = document.getElementById("modal-shell");
+  const mt = document.getElementById("modal-title");
+  const mb = document.getElementById("modal-body");
+  mt.textContent = title || "";
+  mb.innerHTML = bodyHtml || "";
+  shell.classList.remove("hidden");
+  shell.classList.add("show");
+
+  setTimeout(()=>{
+    const firstInput = mb.querySelector("input,textarea,select");
+    if(firstInput) firstInput.focus();
+  }, 50);
+
+  if(window.lucide){
+    lucide.createIcons();
+  }
+}
+function closeModal(){
+  const shell = document.getElementById("modal-shell");
+  shell.classList.remove("show");
+  shell.classList.add("hidden");
+  modalMode = null;
+}
+
+/* Modais específicos */
+function openClientModal(){
+  modalMode = "client-create";
+  openModal("Novo cliente", `
+    <div class="modal-body-inner">
+      <div class="form-row">
+        <label class="small">Nome</label>
+        <input id="modal-client-nome" placeholder="Nome do cliente" />
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <label class="small">Código</label>
+        <input id="modal-client-codigo" placeholder="Código interno (opcional)" />
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <label class="small">Telefone</label>
+        <input id="modal-client-fone" placeholder="Telefone / WhatsApp" />
+      </div>
+      <div class="modal-actions">
+        <button onclick="confirmClientModal()">Salvar</button>
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmClientModal(){
+  const nome = (document.getElementById("modal-client-nome").value || "").trim();
+  const codigo = (document.getElementById("modal-client-codigo").value || "").trim();
+  const fone = (document.getElementById("modal-client-fone").value || "").trim();
+  if(!nome){
+    showToast("Nome do cliente é obrigatório.","error");
+    return;
+  }
+  const id = crypto.randomUUID();
+  clients.push({id,nome,codigo,fone});
+  saveAll();
+  log("Cliente criado: "+nome);
+  showToast("Cliente criado com sucesso.","ok");
+  closeModal();
+  renderClients();
+}
+
+function openFolderModal(){
+  if(!activeClient){
+    showToast("Selecione um cliente primeiro.","error");
+    return;
+  }
+  modalMode = "folder-create";
+  openModal("Nova pasta para "+(activeClient?.nome || "cliente"), `
+    <div class="modal-body-inner">
+      <div class="form-row">
+        <label class="small">Nome da pasta</label>
+        <input id="modal-folder-name" placeholder="Ex.: Recibos 2025" />
+      </div>
+      <div class="modal-actions">
+        <button onclick="confirmFolderModal()">Criar pasta</button>
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmFolderModal(){
+  const name = (document.getElementById("modal-folder-name").value || "").trim();
+  if(!name){
+    showToast("Nome da pasta é obrigatório.","error");
+    return;
+  }
+  folders[activeClient.id] ??= [];
+  folders[activeClient.id].push({id:crypto.randomUUID(),name});
+  saveAll();
+  log("Pasta criado: "+name+" (cliente "+activeClient.nome+")");
+  showToast("Pasta criada.","ok");
+  closeModal();
+  renderFolders();
+}
+
+function openUserModal(){
+  modalMode = "user-create";
+  openModal("Novo usuário", `
+    <div class="modal-body-inner">
+      <div class="form-row">
+        <label class="small">Email</label>
+        <input id="modal-user-email" placeholder="usuario@empresa.com" />
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <label class="small">Papel</label>
+        <select id="modal-user-role">
+          <option value="admin">Admin</option>
+          <option value="padrao">Padrão</option>
+        </select>
+      </div>
+      <p class="small" style="margin-top:6px;opacity:.7;">
+        (Hook futuro) Aqui você pode adicionar PIN ou senha para controle real.
+      </p>
+      <div class="modal-actions">
+        <button onclick="confirmUserModal()">Salvar usuário</button>
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmUserModal(){
+  const email = (document.getElementById("modal-user-email").value || "").trim();
+  const role  = (document.getElementById("modal-user-role").value || "padrao").trim();
+  if(!email){
+    showToast("Email é obrigatório.","error");
+    return;
+  }
+  users.push({email,role});
+  saveAll();
+  log("Usuário cadastrado: "+email+" ("+role+")");
+  showToast("Usuário cadastrado.","ok");
+  closeModal();
+  renderUsers();
+}
+
+function openBatchReceiptsModal(){
+  if(!activeFolder){
+    showToast("Abra uma pasta antes de adicionar em lote.","error");
+    return;
+  }
+  modalMode = "batch-receipts";
+  openModal("Adicionar recibos em lote", `
+    <div class="modal-body-inner">
+      <p class="small" style="margin-bottom:6px;">
+        Cole uma linha por recibo:<br>
+        <b>número; valor; data</b><br>
+        Ex.:<br>
+        1234; 250,00; 10/12/2025
+      </p>
+      <textarea id="modal-batch-text" placeholder="1234; 250,00; 10/12/2025&#10;1235; 300,00; 11/12/2025"></textarea>
+      <div class="modal-actions">
+        <button onclick="confirmBatchReceipts()">Adicionar todos</button>
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmBatchReceipts(){
+  const ta = document.getElementById("modal-batch-text");
+  const raw = (ta.value || "").trim();
+  if(!raw){
+    showToast("Cole pelo menos uma linha de recibo.","error");
+    return;
+  }
+  const lines = raw.split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l);
+  if(!lines.length){
+    showToast("Nenhuma linha válida encontrada.","error");
+    return;
+  }
+  receipts[activeFolder.id] ??= [];
+  let added = 0;
+
+  lines.forEach(line=>{
+    const semi  = line.split(";");
+    const comma = line.split(",");
+    const parts = semi.length >= comma.length ? semi : comma;
+    const numero = (parts[0] || "").trim();
+    const valor  = (parts[1] || "").trim();
+    const data   = (parts[2] || "").trim();
+
+    if(requiredFields.numero && !numero) return;
+    if(requiredFields.valor && !valor) return;
+
+    receipts[activeFolder.id].push({
+      id:crypto.randomUUID(),
+      numero,
+      valor,
+      data,
+      pago:false,
+      imageId:null
+    });
+    added++;
+  });
+
+  saveAll();
+  log("Recibos em lote adicionados na pasta "+activeFolder.name+" (+"+added+")");
+  if(added){
+    showToast(added+" recibo(s) adicionados.","ok");
+  }else{
+    showToast("Nenhuma linha atendeu os campos obrigatórios.","error");
+  }
+  closeModal();
+  renderReceipts();
+}
+
+/* THEME */
+function toggleTheme(){
+  const body = document.body;
+  const current = body.getAttribute("data-theme") || "nebula";
+  const next = current === "nebula" ? "madeira" : "nebula";
+  body.setAttribute("data-theme", next);
+  localStorage.setItem("clientdocs_theme", next);
+}
+
+/* ONLOAD */
+window.addEventListener("load", async () => {
+  try{
+    await openInfodoseDB();
+  }catch(e){
+    console.warn("IndexedDB falhou, seguindo só com localStorage.", e);
+  }
+
+  if(isAdmin) document.getElementById("admin-btn").classList.remove("hidden");
+  syncRequiredCheckboxes();
+  renderClients();
+  await loadWebhookSettings();
+  updatePendingImageBadge();
+
+  const excelInput = document.getElementById("excel-input");
+  if(excelInput){
+    excelInput.addEventListener("change", handleCsvImport);
+  }
+  const camInput = document.getElementById("camera-input");
+  if(camInput){
+    camInput.addEventListener("change", (ev)=>handleImageReceipt(ev.target.files[0]));
+  }
+
+  setupAccordions();
+
+  if(window.lucide){
+    lucide.createIcons();
+  }
+});
+
+/* navegação */
+function openScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="screen-admin"){
+    renderUsers();
+    renderLogs();
+    syncRequiredCheckboxes();
+    loadWebhookSettings();
+  }
+  if(id==="screen-folder"){
+    updatePendingImageBadge();
+    updateFolderDashboard();
+  }
+  setupAccordions();
+  if(window.lucide){
+    lucide.createIcons();
+  }
+}
+
+/* persistência */
+function saveAll(){
+  localStorage.setItem("users",JSON.stringify(users));
+  localStorage.setItem("clients",JSON.stringify(clients));
+  localStorage.setItem("folders",JSON.stringify(folders));
+  localStorage.setItem("receipts",JSON.stringify(receipts));
+  localStorage.setItem("logs",JSON.stringify(logs));
+  localStorage.setItem("requiredFields",JSON.stringify(requiredFields));
+  localStorage.setItem("webhookSettings",JSON.stringify(webhookSettings));
+}
+
+function log(txt){
+  logs.push({txt,at:new Date().toLocaleString()});
+  saveAll();
+}
+
+/* sincronia admin → requiredFields */
+function syncRequiredCheckboxes(){
+  const num = document.getElementById("req-numero");
+  const val = document.getElementById("req-valor");
+  if(!num || !val) return;
+  num.checked = !!requiredFields.numero;
+  val.checked = !!requiredFields.valor;
+}
+
+/* Webhook settings (UI + IndexedDB) */
+async function loadWebhookSettings(){
+  try{
+    const fromDb = await dbGetSetting("webhookSettings");
+    if(fromDb){
+      webhookSettings = fromDb;
+    }
+  }catch(e){
+    console.warn("Erro ao carregar webhookSettings do IndexedDB", e);
+  }
+  const urlInput = document.getElementById("webhook-url");
+  const enabledChk = document.getElementById("webhook-enabled");
+  if(urlInput) urlInput.value = webhookSettings.url || "";
+  if(enabledChk) enabledChk.checked = !!webhookSettings.enabled;
+}
+
+async function saveWebhookSettings(){
+  const urlInput = document.getElementById("webhook-url");
+  const enabledChk = document.getElementById("webhook-enabled");
+  webhookSettings.url = (urlInput?.value || "").trim();
+  webhookSettings.enabled = !!(enabledChk && enabledChk.checked);
+
+  saveAll();
+  try{
+    await dbSaveSetting("webhookSettings", webhookSettings);
+  }catch(e){
+    console.warn("Erro ao salvar webhookSettings no IndexedDB", e);
+  }
+  showToast("Configurações de webhook salvas.","ok");
+}
+
+/* CLIENTES */
+function renderClients(){
+  const input = document.getElementById("search");
+  const q = (input?.value || "").toLowerCase();
+  const list = clients.filter(c =>
+    (c.nome   || "").toLowerCase().includes(q) ||
+    (c.codigo || "").toLowerCase().includes(q) ||
+    (c.fone   || "").toLowerCase().includes(q)
+  );
+
+  const target = document.getElementById("client-list");
+  target.innerHTML = list.map(c=>`
+    <div class="list-item fade-up" onclick="openClient('${c.id}')">
+      <b>${c.nome}</b><br>
+      <span class="small">${c.codigo || "—"} — ${c.fone || ""}</span>
+    </div>
+  `).join("");
+}
+
+/* EXPORT CSV CLIENTES */
+function exportClientsCsv(){
+  if(!clients.length){
+    showToast("Não há clientes para exportar.","error");
+    return;
+  }
+  const header = ["codigo","nome","telefone"];
+  const lines = [header.join(";")];
+  clients.forEach(c=>{
+    lines.push([
+      c.codigo || "",
+      c.nome   || "",
+      c.fone   || ""
+    ].join(";"));
+  });
+  const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "clientdocs_clientes.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Planilha de clientes exportada.","ok");
+}
+
+/* IMPORTAR EXCEL / CSV */
+function importExcel(){
+  const input = document.getElementById("excel-input");
+  if(!input) return;
+  input.value = "";
+  input.click();
+}
+
+function handleCsvImport(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const text = e.target.result;
+    const imported = parseClientsCsv(text);
+    if(imported.length === 0){
+      showToast("Não encontrei linhas válidas no arquivo.","error");
+      return;
+    }
+    imported.forEach(c=>{
+      clients.push({
+        id:crypto.randomUUID(),
+        nome:c.nome || "",
+        codigo:c.codigo || "",
+        fone:c.fone || ""
+      });
+    });
+    saveAll();
+    log("Importação CSV: "+imported.length+" clientes adicionados.");
+    showToast("Importei "+imported.length+" clientes.","ok");
+    renderClients();
+  };
+  reader.readAsText(file, "utf-8");
+  ev.target.value = "";
+}
+
+// tenta detectar ; ou , e cabeçalho
+function parseClientsCsv(text){
+  const lines = text.split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l);
+  if(!lines.length) return [];
+
+  function splitLine(line){
+    const semi  = line.split(";");
+    const comma = line.split(",");
+    return (semi.length >= comma.length) ? semi : comma;
+  }
+
+  let header = splitLine(lines[0]).map(s=>s.trim().toLowerCase());
+  let dataStartIndex = 0;
+  let hasHeader = header.some(h =>
+    h.includes("nome") ||
+    h.includes("cód") || h.includes("cod") ||
+    h.includes("tel") || h.includes("fone") || h.includes("telefone")
+  );
+
+  let colNome = 0, colCodigo = 1, colFone = 2;
+  if(hasHeader){
+    dataStartIndex = 1;
+    colNome = header.findIndex(h => h.includes("nome"));
+    colCodigo = header.findIndex(h => h.includes("cód") || h.includes("cod"));
+    colFone = header.findIndex(h => h.includes("tel") || h.includes("fone") || h.includes("telefone"));
+    if(colNome < 0) colNome = 0;
+    if(colCodigo < 0) colCodigo = 1;
+    if(colFone < 0) colFone = 2;
+  }
+
+  const result = [];
+  for(let i=dataStartIndex; i<lines.length; i++){
+    const cols = splitLine(lines[i]);
+    if(!cols.length) continue;
+    const nome  = (cols[colNome]  || "").trim();
+    const codigo= (cols[colCodigo||1]|| "").trim();
+    const fone  = (cols[colFone  ||2]|| "").trim();
+    if(!nome && !codigo && !fone) continue;
+    result.push({nome,codigo,fone});
+  }
+  return result;
+}
+
+/* CLIENTE → PASTAS */
+let activeClient = null;
+
+function openClient(id){
+  activeClient = clients.find(c=>c.id===id);
+  document.getElementById("client-name").innerText = activeClient?.nome || "Cliente";
+  openScreen("screen-client");
+  renderFolders();
+}
+
+function renderFolders(){
+  const list = folders[activeClient.id] || [];
+  const target = document.getElementById("folder-list");
+  target.innerHTML = list.map(f=>`
+    <div class="list-item fade-up" onclick="openFolder('${f.id}')">${f.name}</div>
+  `).join("");
+}
+
+/* PASTA → RECIBOS */
+let activeFolder = null;
+
+function openFolder(fid){
+  activeFolder = (folders[activeClient.id] || []).find(f=>f.id===fid);
+  document.getElementById("folder-name").innerText = activeFolder?.name || "Pasta";
+  openScreen("screen-folder");
+  clearReceiptForm();
+  renderReceipts();
+  updateFolderDashboard();
+  updatePendingImageBadge();
+}
+
+function clearReceiptForm(){
+  const numero = document.getElementById("rec-numero");
+  const valor  = document.getElementById("rec-valor");
+  const data   = document.getElementById("rec-data");
+  const pago   = document.getElementById("rec-pago");
+
+  [numero,valor,data].forEach(el=>{
+    if(el){
+      el.value = "";
+      el.classList.remove("input-error");
+    }
+  });
+  if(pago){
+    pago.checked = false;
+  }
+}
+
+/* badge de anexos */
+function updatePendingImageBadge(){
+  const el = document.getElementById("pending-images-info");
+  if(!el) return;
+  if(pendingImageId){
+    el.textContent = "1 imagem pendente para o próximo recibo.";
+  }else{
+    el.textContent = "Nenhuma imagem pendente para o próximo recibo.";
+  }
+}
+
+function clearPendingImage(){
+  pendingImageId = null;
+  updatePendingImageBadge();
+  showToast("Anexo pendente limpo.","ok");
+}
+
+/* ADD RECEIPT */
+function addReceipt(){
+  if(!activeFolder){
+    showToast("Abra uma pasta antes de adicionar recibos.","error");
+    return;
+  }
+
+  const numeroInput = document.getElementById("rec-numero");
+  const valorInput  = document.getElementById("rec-valor");
+  const dataInput   = document.getElementById("rec-data");
+  const pagoInput   = document.getElementById("rec-pago");
+
+  [numeroInput,valorInput,dataInput].forEach(el=>el && el.classList.remove("input-error"));
+
+  const numero = (numeroInput?.value || "").trim();
+  const valor  = (valorInput?.value  || "").trim();
+  const data   = (dataInput?.value   || "").trim();
+  const pago   = !!(pagoInput && pagoInput.checked);
+
+  let hasError = false;
+  if(requiredFields.numero && !numero){
+    numeroInput.classList.add("input-error");
+    showToast("Número do pedido é obrigatório.","error");
+    hasError = true;
+  }
+  if(requiredFields.valor && !valor){
+    valorInput.classList.add("input-error");
+    showToast("Valor do pedido é obrigatório.","error");
+    hasError = true;
+  }
+  if(hasError) return;
+
+  receipts[activeFolder.id] ??= [];
+  receipts[activeFolder.id].push({
+    id:crypto.randomUUID(),
+    valor:valor || "",
+    numero:numero || "",
+    data:data || "",
+    pago:pago,
+    imageId: pendingImageId || null
+  });
+  saveAll();
+  log("Recibo adicionado na pasta "+activeFolder.name);
+  showToast("Recibo salvo.","ok");
+  pendingImageId = null;
+  updatePendingImageBadge();
+  clearReceiptForm();
+  renderReceipts();
+}
+
+function renderReceipts(){
+  const list = receipts[activeFolder.id] || [];
+  const target = document.getElementById("receipt-list");
+  target.innerHTML = list.map(r=>{
+    const statusClass = r.pago ? "receipt-status-paid" : "receipt-status-open";
+    const statusLabel = r.pago ? "Pago" : "Em aberto";
+    const hasImage = !!r.imageId;
+    const imageHtml = hasImage
+      ? `<span class="receipt-has-image">
+           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+             <circle cx="9" cy="11" r="2"></circle>
+             <path d="M21 15l-3.5-3.5L14 15"></path>
+           </svg>
+           imagem
+         </span>`
+      : "";
+    return `
+      <div class="list-item fade-up">
+        Nº ${r.numero || "—"}<br>
+        <div class="receipt-meta-line">
+          <span class="small">
+            R$ ${r.valor || "0,00"} · ${r.data || "sem data"} ${imageHtml}
+          </span>
+          <span
+            class="receipt-status-pill ${statusClass}"
+            onclick="toggleReceiptPaid('${r.id}')"
+          >
+            ${statusLabel}
+          </span>
+        </div>
+      </div>
+    `;
+  }).join("");
+  updateFolderDashboard();
+}
+
+function toggleReceiptPaid(rid){
+  if(!activeFolder) return;
+  const list = receipts[activeFolder.id] || [];
+  const rec = list.find(r=>r.id === rid);
+  if(!rec) return;
+  rec.pago = !rec.pago;
+  saveAll();
+  log("Recibo "+(rec.numero || "")+" marcado como "+(rec.pago ? "pago" : "em aberto")+" na pasta "+activeFolder.name);
+  renderReceipts();
+}
+
+/* EXPORT PDF REAL */
+function exportFolderPdf(){
+  if(!activeFolder){
+    showToast("Abra uma pasta para exportar.","error");
+    return;
+  }
+  const list = receipts[activeFolder.id] || [];
+  if(!list.length){
+    showToast("Não há recibos nesta pasta.","error");
+    return;
+  }
+
+  const pdfLib = window.jspdf;
+  if(!pdfLib || !pdfLib.jsPDF){
+    showToast("Biblioteca de PDF não carregada.","error");
+    return;
+  }
+
+  const { jsPDF } = pdfLib;
+  const doc = new jsPDF({ unit:"pt", format:"a4" });
+  const pageWidth  = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 40;
+
+  /* Cabeçalho estilo Infodose */
+  doc.setFillColor(5, 8, 20);
+  doc.rect(0, 0, pageWidth, 80, "F");
+
+  doc.setTextColor(255,255,255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.text("ClientDocs · Recibos", margin, 40);
+
+  doc.setFontSize(10);
+  const clientName = activeClient?.nome || "Cliente";
+  const folderName = activeFolder?.name || "Pasta";
+  doc.text("Cliente: "+clientName, margin, 58);
+  doc.text("Pasta: "+folderName, margin, 72);
+
+  /* Tabela simples */
+  let y = 110;
+  doc.setTextColor(0,0,0);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(11);
+
+  const colNum   = margin;
+  const colValor = margin + 120;
+  const colData  = margin + 240;
+  const colPago  = margin + 360;
+
+  doc.text("Nº Pedido", colNum, y);
+  doc.text("Valor (R$)", colValor, y);
+  doc.text("Data", colData, y);
+  doc.text("Pago?", colPago, y);
+
+  doc.setDrawColor(220,220,220);
+  doc.line(margin, y+4, pageWidth-margin, y+4);
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(10);
+  y += 18;
+
+  list.forEach((r)=>{
+    if(y > pageHeight - 60){
+      doc.addPage();
+      y = 60;
+      doc.setFont("helvetica","bold");
+      doc.text("Nº Pedido", colNum, y);
+      doc.text("Valor (R$)", colValor, y);
+      doc.text("Data", colData, y);
+      doc.text("Pago?", colPago, y);
+      doc.line(margin, y+4, pageWidth-margin, y+4);
+      doc.setFont("helvetica","normal");
+      y += 18;
+    }
+    const numero = r.numero || "—";
+    const valor  = r.valor  || "0,00";
+    const data   = r.data   || "sem data";
+    const pago   = r.pago ? "Sim" : "Não";
+
+    doc.text(String(numero), colNum,   y);
+    doc.text(String(valor),  colValor, y);
+    doc.text(String(data),   colData,  y);
+    doc.text(String(pago),   colPago,  y);
+
+    y += 16;
+  });
+
+  const fileName = "recibos_" +
+    sanitizeFileName(clientName) + "_" +
+    sanitizeFileName(folderName) + ".pdf";
+
+  doc.save(fileName);
+  showToast("PDF gerado com sucesso.","ok");
+}
+
+function sanitizeFileName(name){
+  return (name || "arquivo")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9_\-]+/gi,"_");
+}
+
+/* EXPORT CSV RECIBOS POR PASTA */
+function exportFolderCsv(){
+  if(!activeFolder){
+    showToast("Abra uma pasta para exportar recibos.","error");
+    return;
+  }
+  const list = receipts[activeFolder.id] || [];
+  if(!list.length){
+    showToast("Não há recibos nesta pasta.","error");
+    return;
+  }
+
+  const clientName = activeClient?.nome || "";
+  const folderName = activeFolder?.name || "";
+
+  const header = ["numero","valor","data","pago","imageId","cliente","pasta"];
+  const lines = [header.join(";")];
+
+  list.forEach(r=>{
+    lines.push([
+      r.numero || "",
+      r.valor  || "",
+      r.data   || "",
+      r.pago ? "1" : "0",
+      r.imageId || "",
+      clientName,
+      folderName
+    ].join(";"));
+  });
+
+  const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "recibos_" +
+    sanitizeFileName(clientName) + "_" +
+    sanitizeFileName(folderName || "pasta") + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("CSV de recibos exportado.","ok");
+}
+
+/* CAMERA RÁPIDA + OCR TESSERACT + IndexedDB */
+function quickReceipt(){
+  const input = document.getElementById("camera-input");
+  if(!input){
+    showToast("Câmera não disponível neste dispositivo.","error");
+    return;
+  }
+  input.value = "";
+  input.click();
+}
+
+function handleImageReceipt(file){
+  if(!file) return;
+  if(!window.Tesseract || !Tesseract.recognize){
+    showToast("OCR não carregou. Verifique sua conexão.", "error");
+    return;
+  }
+
+  const imgId = "recibo_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+  dbSaveImage(imgId, file).catch(e=>console.warn("Erro ao salvar imagem no IndexedDB", e));
+  pendingImageId = imgId;
+  updatePendingImageBadge();
+
+  log("Imagem recebida para OCR: "+file.name);
+  showToast("Lendo texto do recibo...", "ok");
+
+  Tesseract.recognize(file, "por+eng", { logger:m=>console.log(m) })
+    .then(({ data })=>{
+      const text = data.text || "";
+      console.log("OCR TEXT:", text);
+      const fields = extractReceiptFieldsFromText(text);
+
+      const numeroInput = document.getElementById("rec-numero");
+      const valorInput  = document.getElementById("rec-valor");
+      const dataInput   = document.getElementById("rec-data");
+
+      if(fields.numero && numeroInput) numeroInput.value = fields.numero;
+      if(fields.valor && valorInput)   valorInput.value  = fields.valor;
+      if(fields.data && dataInput)     dataInput.value   = fields.data;
+
+      if(fields.numero || fields.valor || fields.data){
+        showToast("Campos preenchidos a partir do recibo.","ok");
+      }else{
+        showToast("OCR não encontrou padrões claros. Revise manualmente.", "error");
+      }
+    })
+    .catch(err=>{
+      console.error("OCR error", err);
+      showToast("Erro ao processar imagem do recibo.", "error");
+    });
+}
+
+/* Heurística simples para extrair nº, valor e data de texto OCR */
+function extractReceiptFieldsFromText(text){
+  const clean = text.replace(/\s+/g," ").trim();
+
+  // Data: dd/mm/aaaa ou dd-mm-aaaa
+  const dateMatch = clean.match(/\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b/);
+  const data = dateMatch ? dateMatch[1] : "";
+
+  // Valor: 12,34 / 1.234,56 etc
+  const valorMatch = clean.match(/\b(\d{1,3}(?:\.\d{3})*,\d{2})\b|\b(\d+,\d{2})\b/);
+  let valor = "";
+  if(valorMatch){
+    valor = valorMatch[1] || valorMatch[2] || "";
+    valor = valor.replace(/\s/g,"");
+  }
+
+  // Número do pedido: pega primeiro número com 4+ dígitos
+  const numeroMatch = clean.match(/\b(\d{4,})\b/);
+  let numero = "";
+  if(numeroMatch){
+    numero = numeroMatch[1];
+  }
+
+  return { numero, valor, data };
+}
+
+/* ADMIN LISTAS */
+function renderUsers(){
+  const target = document.getElementById("user-list");
+  target.innerHTML = users.map(u=>`
+    <div class="small">• ${u.email || "usuário"} — ${u.role || "padrão"}</div>
+  `).join("");
+}
+
+function renderLogs(){
+  const target = document.getElementById("log-list");
+  target.innerHTML = logs.map(l=>`
+    <div>${l.at} — ${l.txt}</div>
+  `).join("");
+}
+
+function saveReq(){
+  const num = document.getElementById("req-numero");
+  const val = document.getElementById("req-valor");
+  requiredFields.numero = !!(num && num.checked);
+  requiredFields.valor  = !!(val && val.checked);
+  saveAll();
+  log("Admin alterou campos obrigatórios: número="+requiredFields.numero+", valor="+requiredFields.valor);
+  showToast("Campos obrigatórios atualizados.","ok");
+}
+
+/* DASHBOARD FINANCEIRO */
+function parseValorToNumber(valorStr){
+  if(!valorStr) return 0;
+  let s = String(valorStr).trim();
+  s = s.replace(/\./g,"").replace(",",".");
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function getFolderStats(){
+  if(!activeFolder) return {
+    total:0,totalPago:0,totalAberto:0,
+    qtd:0,qtdPago:0,qtdAberto:0
+  };
+  const list = receipts[activeFolder.id] || [];
+  let total = 0;
+  let totalPago = 0;
+  let qtdPago = 0;
+  let qtdAberto = 0;
+
+  list.forEach(r=>{
+    const v = parseValorToNumber(r.valor);
+    total += v;
+    if(r.pago){
+      totalPago += v;
+      qtdPago++;
+    }else{
+      qtdAberto++;
+    }
+  });
+
+  const totalAberto = total - totalPago;
+  return {
+    total,
+    totalPago,
+    totalAberto,
+    qtd:list.length,
+    qtdPago,
+    qtdAberto
+  };
+}
+
+function updateFolderDashboard(){
+  const box = document.getElementById("folder-dashboard");
+  if(!box || !activeFolder){
+    return;
+  }
+  const s = getFolderStats();
+  const fmt = v => Number(v || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+
+  box.innerHTML = `
+    <div class="folder-dashboard-row">
+      <span>Total de recibos</span>
+      <strong>${s.qtd}</strong>
+    </div>
+    <div class="folder-dashboard-row">
+      <span>Pago</span>
+      <strong>R$ ${fmt(s.totalPago)} (${s.qtdPago})</strong>
+    </div>
+    <div class="folder-dashboard-row">
+      <span>Em aberto</span>
+      <strong>R$ ${fmt(s.totalAberto)} (${s.qtdAberto})</strong>
+    </div>
+    <div class="folder-dashboard-row">
+      <span>Previsão total</span>
+      <strong>R$ ${fmt(s.total)}</strong>
+    </div>
+  `;
+}
+
+/* WEBHOOK · ENVIO REAL (com imageId) */
+async function sendFolderToWebhook(){
+  if(!activeClient || !activeFolder){
+    showToast("Abra um cliente e uma pasta antes de enviar.","error");
+    return;
+  }
+  if(!webhookSettings.enabled || !webhookSettings.url){
+    showToast("Configure e ative o webhook no painel Admin.","error");
+    return;
+  }
+
+  const folderReceipts = (receipts[activeFolder.id] || []).map(r=>({
+    id: r.id,
+    numero: r.numero || "",
+    valor: r.valor || "",
+    data: r.data || "",
+    pago: !!r.pago,
+    imageId: r.imageId || null
+  }));
+
+  const stats = getFolderStats();
+
+  const payload = {
+    source: "ClientDocs · Dual.Infodose",
+    version: "7.3",
+    timestamp: new Date().toISOString(),
+    client: {
+      id: activeClient.id,
+      nome: activeClient.nome,
+      codigo: activeClient.codigo,
+      telefone: activeClient.fone
+    },
+    folder: {
+      id: activeFolder.id,
+      name: activeFolder.name
+    },
+    receipts: folderReceipts,
+    financeSummary: {
+      total: stats.total,
+      totalPago: stats.totalPago,
+      totalAberto: stats.totalAberto,
+      qtd: stats.qtd,
+      qtdPago: stats.qtdPago,
+      qtdAberto: stats.qtdAberto
+    }
+  };
+
+  try{
+    const resp = await fetch(webhookSettings.url, {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if(!resp.ok){
+      throw new Error("HTTP "+resp.status);
+    }
+    showToast("Pasta enviada para webhook.","ok");
+    log("Webhook enviado para "+webhookSettings.url+" (pasta "+activeFolder.name+")");
+  }catch(e){
+    console.error("Erro webhook", e);
+    showToast("Erro ao enviar para webhook.","error");
+  }
+}
+
+async function sendWebhookSample(){
+  if(!webhookSettings.url){
+    showToast("Preencha a URL do webhook antes de testar.","error");
+    return;
+  }
+
+  const samplePayload = {
+    source: "ClientDocs · Dual.Infodose",
+    version: "7.3",
+    test: true,
+    message: "Ping de teste do ClientDocs",
+    timestamp: new Date().toISOString()
+  };
+
+  try{
+    const resp = await fetch(webhookSettings.url, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(samplePayload)
+    });
+    if(!resp.ok){
+      throw new Error("HTTP "+resp.status);
+    }
+    showToast("Teste enviado para webhook.","ok");
+    log("Webhook TEST enviado para "+webhookSettings.url);
+  }catch(e){
+    console.error("Erro webhook TEST", e);
+    showToast("Erro ao enviar teste para webhook.","error");
+  }
+}
+
+/* ACCORDION SETUP */
+function setupAccordions(){
+  const cards = document.querySelectorAll(".card-base[data-accordion]");
+  cards.forEach(card=>{
+    const header = card.querySelector("[data-accordion-header]");
+    const body   = card.querySelector("[data-accordion-body]");
+    if(!header || !body) return;
+
+    if(header.dataset.accordionBound === "1") return;
+    header.dataset.accordionBound = "1";
+
+    const chevron = header.querySelector(".accordion-chevron");
+
+    function applyState(){
+      const state = card.getAttribute("data-accordion") || "open";
+      if(state === "closed"){
+        body.style.maxHeight = "0";
+        body.style.opacity   = ".0";
+      }else{
+        body.style.maxHeight = body.scrollHeight + "px";
+        body.style.opacity   = "1";
+      }
+      if(chevron){
+        chevron.textContent = state === "open" ? "⌄" : "›";
+      }
+    }
+
+    header.addEventListener("click", ()=>{
+      const state = card.getAttribute("data-accordion") || "open";
+      card.setAttribute("data-accordion", state === "open" ? "closed" : "open");
+      applyState();
+    });
+
+    window.addEventListener("resize", ()=>{
+      if(card.getAttribute("data-accordion") === "open"){
+        body.style.maxHeight = body.scrollHeight + "px";
+      }
+    });
+
+    applyState();
+  });
+}
+
+/* FAB ORB + MENU AÇÕES */
+let fabOpen = false;
+function toggleFabMenu(){
+  fabOpen = !fabOpen;
+  const group = document.querySelector(".camera-fab-group");
+  const opts = document.getElementById("fab-options");
+  if(group){
+    group.classList.toggle("open", fabOpen);
+  }
+  if(opts){
+    if(fabOpen) opts.classList.add("show");
+    else opts.classList.remove("show");
+  }
+  if(window.lucide){
+    lucide.createIcons();
+  }
+}
+
+function fabCamera(){
+  toggleFabMenu();
+  quickReceipt();
+}
+
+function fabPrediction(){
+  toggleFabMenu();
+  openPredictionPanel();
+}
+
+function fabChat(){
+  toggleFabMenu();
+  openChatModal();
+}
+
+function fabTheme(){
+  toggleFabMenu();
+  toggleTheme();
+}
+
+/* Painel de previsão (modal) */
+function openPredictionPanel(){
+  if(!activeFolder){
+    showToast("Abra uma pasta para ver o painel de previsão.","error");
+    return;
+  }
+  const s = getFolderStats();
+  const ratio = s.total ? (s.totalAberto / s.total) : 0;
+  let risco = "baixo";
+  if(ratio >= 0.8) risco = "crítico";
+  else if(ratio >= 0.6) risco = "alto";
+  else if(ratio >= 0.4) risco = "moderado";
+
+  const fmt = v => Number(v || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+
+  const html = `
+    <div class="modal-body-inner">
+      <p class="small">
+        Cliente: <b>${escapeHtml(activeClient?.nome || "")}</b><br>
+        Pasta: <b>${escapeHtml(activeFolder?.name || "")}</b>
+      </p>
+
+      <div class="folder-dashboard" style="margin-top:6px;">
+        <div class="folder-dashboard-row">
+          <span>Total de recibos</span>
+          <strong>${s.qtd}</strong>
+        </div>
+        <div class="folder-dashboard-row">
+          <span>Pago</span>
+          <strong>R$ ${fmt(s.totalPago)} (${s.qtdPago})</strong>
+        </div>
+        <div class="folder-dashboard-row">
+          <span>Em aberto</span>
+          <strong>R$ ${fmt(s.totalAberto)} (${s.qtdAberto})</strong>
+        </div>
+        <div class="folder-dashboard-row">
+          <span>Previsão total</span>
+          <strong>R$ ${fmt(s.total)}</strong>
+        </div>
+      </div>
+
+      <p class="small" style="margin-top:8px;">
+        Risco de fiado estimado: <b>${risco.toUpperCase()}</b><br>
+        Proporção em aberto: <b>${(ratio*100).toFixed(1)}%</b>
+      </p>
+
+      <p class="small" style="margin-top:4px;opacity:.8;">
+        Dica rápida: use este painel antes de liberar novos fiados para a obra.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Fechar</button>
+      </div>
+    </div>
+  `;
+  openModal("Painel de previsão", html);
+}
+
+/* Chat IA via webhook */
+function openChatModal(){
+  if(!webhookSettings.url){
+    showToast("Configure o webhook no Admin para usar o chat de IA.","error");
+    return;
+  }
+  modalMode = "ai-chat";
+  openModal("Chat com IA (Infodose)", `
+    <div class="modal-body-inner">
+      <div id="ai-chat-thread" class="ai-chat-thread">
+        <div class="ai-msg ai-msg-bot">
+          Olá, este é o canal de IA conectado ao webhook da Infodose.
+          Mande uma mensagem sobre recibos, fiados ou resumo da obra.
+        </div>
+      </div>
+      <textarea id="ai-chat-input" placeholder="Escreva sua pergunta aqui..."></textarea>
+      <div class="modal-actions">
+        <button onclick="sendAiMessage()">Enviar</button>
+        <button class="btn-ghost" onclick="closeModal()">Fechar</button>
+      </div>
+    </div>
+  `);
+}
+
+function sendAiMessage(){
+  const input = document.getElementById("ai-chat-input");
+  const thread = document.getElementById("ai-chat-thread");
+  const text = (input?.value || "").trim();
+  if(!text){
+    showToast("Digite uma mensagem.","error");
+    return;
+  }
+  if(thread){
+    thread.innerHTML += `<div class="ai-msg ai-msg-user">${escapeHtml(text)}</div>`;
+    thread.scrollTop = thread.scrollHeight;
+  }
+  input.value = "";
+  if(!webhookSettings.url){
+    showToast("Webhook não configurado.","error");
+    return;
+  }
+
+  fetch(webhookSettings.url, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      source:"ClientDocs Chat",
+      version:"7.3",
+      mode:"chat",
+      message:text,
+      timestamp:new Date().toISOString()
+    })
+  })
+  .then(resp=>resp.json().catch(()=>({})))
+  .then(data=>{
+    const reply = data.reply || data.message || JSON.stringify(data);
+    if(thread){
+      thread.innerHTML += `<div class="ai-msg ai-msg-bot">${escapeHtml(reply)}</div>`;
+      thread.scrollTop = thread.scrollHeight;
+    }
+  })
+  .catch(err=>{
+    console.error("Chat webhook error", err);
+    showToast("Erro ao falar com a IA.","error");
+  });
+}
+</script>
+
+<script>
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
